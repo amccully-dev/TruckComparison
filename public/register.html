@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+</head>
+<body>
+  <h1>Register</h1>
+  
+  <!-- Registration Form -->
+  <form id="registerForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" name="firstName" required>
+    <br>
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" name="lastName" required>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <button type="submit">Register</button>
+  </form>
+
+  <!-- Error message display -->
+  <p id="errorMessage"></p>
+
+  <!-- Return to Login button -->
+  <button id="returnToLogin" onclick="location.href='/index.html'">Return to Login</button>
+
+  <script>
+    // Event listener for the registration form submission
+    document.getElementById('registerForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      // Gather user input from the registration form
+      const username = document.getElementById('username').value;
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        // Send a registration request to the server
+        const response = await fetch('/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, firstName, lastName, password }),
+        });
+
+        if (response.ok) {
+          // Registration successful
+          console.log('Registration successful');
+
+          // Display a success message to the user
+          const successMessage = document.createElement('p');
+          successMessage.textContent = 'User successfully added! You can now log in.';
+          successMessage.style.color = 'green';
+
+          // Append the message to the form
+          const form = document.getElementById('registerForm');
+          form.insertAdjacentElement('afterend', successMessage);
+        } else {
+          // Registration failed, display an error message
+          const errorData = await response.json();
+          console.error('User registration failed:', errorData);
+
+          // Display error message on the page
+          const errorMessage = document.getElementById('errorMessage');
+          errorMessage.textContent = `User registration failed. ${errorData.message || 'Please try again later.'}`;
+          errorMessage.style.color = 'red';
+        }
+      } catch (error) {
+        // Handle unexpected errors
+        console.error('An unexpected error occurred:', error);
+
+        // Display error message on the page
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = 'An unexpected error occurred. Please try again later.';
+        errorMessage.style.color = 'red';
+      }
+    });
+  </script>
+</body>
+</html>

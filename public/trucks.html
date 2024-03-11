@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trucks</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <script>
+    // Check if the header has already been loaded
+    const isHeaderLoaded = document.querySelector('header');
+
+    if (!isHeaderLoaded) {
+      // Load and include the header dynamically
+      fetch('header.html')
+        .then(response => response.text())
+        .then(data => {
+          document.body.insertAdjacentHTML('afterbegin', data);
+
+          // Execute scripts within the inserted content
+          const scripts = document.querySelectorAll('script');
+          scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            newScript.text = script.text;
+            document.head.appendChild(newScript);
+          });
+
+          // Add event listener for the hamburger menu
+          const hamburger = document.querySelector('.hamburger');
+          const nav = document.querySelector('nav');
+
+          hamburger.addEventListener('click', function () {
+            nav.style.display = (getComputedStyle(nav).display === 'none') ? 'flex' : 'none';
+          });
+        });
+    }
+  </script>
+  <br>
+  <br>
+  <h1>Trucks</h1>
+
+  <!-- Add Truck Form -->
+  <h3>Add New Truck</h3>
+  <form id="addTruckForm" class="add-form">
+    <!-- Input fields for truck details -->
+    <label for="year">Year:</label>
+    <input type="text" id="year" name="year" required>
+    <label for="make">Make:</label>
+    <input type="text" id="make" name="make" required>
+    <label for="model">Model:</label>
+    <input type="text" id="model" name="model" required>
+    <label for="tareWeight">Tare Weight:</label>
+    <input type="number" id="tareWeight" name="tareWeight" required>
+    <label for="plate">Plate:</label>
+    <input type="text" id="plate" name="plate" required>
+    <label for="trailer">Trailer:</label>
+    <select id="trailer" name="trailer" required onchange="toggleFlatbedLength()">
+      <option value="dump">Dump</option>
+      <option value="flatbed">Flatbed</option>
+      <option value="low-boy">Low Boy</option>
+      <option value="refer">Refer</option>
+    </select>
+
+    <div id="flatbedLengthContainer" style="display: none;">
+      <label for="flatbedLength">Flatbed Length:</label>
+      <input type="text" id="flatbedLength" name="flatbedLength" required>
+    </div>
+    <label for="equipmentNumber">Equipment Number:</label>
+    <input type="text" id="equipmentNumber" name="equipmentNumber" required>
+    <label for="fuelMileage">Fuel Mileage:</label>
+    <input type="text" id="fuelMileage" name="fuelMileage" required>
+    <label for="fuelCapacity">Fuel Capacity:</label>
+    <input type="text" id="fuelCapacity" name="fuelCapacity" required>
+
+    <!-- Submit button for adding a truck -->
+    <button type="submit">Add Truck</button>
+  </form>
+
+  <!-- Display Truck Table -->
+  <h3>Current Truck Information</h3>
+  <table border="1">
+    <thead>
+      <!-- Table header -->
+      <tr>
+        <th>Truck ID</th>
+        <th>Year</th>
+        <th>Make</th>
+        <th>Model</th>
+        <th>Plate</th>
+        <th>Trailer</th>
+        <th>Flatbed Length</th>
+        <th>Equipment Number</th>
+        <th>Fuel Mileage</th>
+        <th>Fuel Capacity</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="truckTableBody">
+      <!-- Truck data will be displayed here -->
+    </tbody>
+  </table>
+
+  <!-- Script to fetch and display truck data -->
+  <script>
+    // Function to toggle the display of flatbed length based on trailer type
+    function toggleFlatbedLength() {
+      const trailerSelect = document.getElementById('trailer');
+      const flatbedLengthContainer = document.getElementById('flatbedLengthContainer');
+
+      if (trailerSelect.value === 'flatbed') {
+        flatbedLengthContainer.style.display = 'block';
+      } else {
+        flatbedLengthContainer.style.display = 'none';
+      }
+    }
+
+    // Function to fetch and display truck data
+    async function displayTrucks() {
+      const response = await fetch('/trucks');
+      const truckData = await response.json();
+
+      const truckTableBody = document.getElementById('truckTableBody');
+      truckTableBody.innerHTML = '';
+
+      truckData.forEach(truck => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${truck.TruckID}</td>
+          <td>${truck.Year}</td>
+          <td>${truck.Make}</td>
+          <td>${truck.Model}</td>
+          <td>${truck.Plate}</td>
+          <td>${truck.Trailer}</td>
+          <td>${truck.FlatbedLength}</td>
+          <td>${truck.EquipmentNumber}</td>
+          <td>${truck.FuelMileage}</td>
+          <td>${truck.FuelCapacity}</td>
+          <td><button onclick="updateTruck(${truck.TruckID})">Update</button></td>
+        `;
+        truckTableBody.appendChild(row);
+      });
+    }
+
+    // Function to handle form submission for adding a truck
+    document.getElementById('addTruckForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+      const truckData = {};
+      formData.forEach((value, key) => {
+        truckData[key] = value;
+      });
+
+      const response = await fetch('/addTruck', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(truckData),
+      });
+
+      if (response.ok) {
+        console.log('Truck added successfully');
+        displayTrucks(); // Refresh the truck table
+      } else {
+        console.error('Failed to add truck');
+      }
+    });
+
+    // Function to handle truck update
+    function updateTruck(truckID) {
+      // Implement logic to update a specific truck, if needed
+      console.log('Updating truck with ID:', truckID);
+    }
+
+    // Display trucks when the page loads
+    displayTrucks();
+  </script>
+</body>
+</html>

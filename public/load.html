@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Load</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <script>
+    // Check if the header has already been loaded
+    const isHeaderLoaded = document.querySelector('header');
+
+    if (!isHeaderLoaded) {
+      // Load and include the header dynamically
+      fetch('header.html')
+        .then(response => response.text())
+        .then(data => {
+          document.body.insertAdjacentHTML('afterbegin', data);
+
+          // Execute scripts within the inserted content
+          const scripts = document.querySelectorAll('script');
+          scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            newScript.text = script.text;
+            document.head.appendChild(newScript);
+          });
+
+          // Add event listener for the hamburger menu
+          const hamburger = document.querySelector('.hamburger');
+          const nav = document.querySelector('nav');
+
+          hamburger.addEventListener('click', function () {
+            nav.style.display = (getComputedStyle(nav).display === 'none') ? 'flex' : 'none';
+          });
+        });
+    }
+  </script>
+</body>
+</html>

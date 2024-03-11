@@ -1,0 +1,170 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+/* Forms on Broker and Truck pages */
+.add-form {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+    width: calc(100% - 40px);
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #f5f5f5; /* Light grey background color */
+}
+
+.add-form label {
+    display: block;
+    margin-bottom: 5px;
+    width: calc(30% - 10px);
+}
+
+.add-form input,
+.add-form textarea,
+.add-form select {
+    width: calc(70% - 10px);
+    padding: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.add-form textarea {
+    height: 80px;
+}
+
+.add-form button {
+    width: calc(100% - 10px);
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.add-form button:hover {
+    background-color: #45a049;
+}
+
+/* Table Styles */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+}
+
+thead {
+    background-color: #f5f5f5; /* Light grey background color for the header row */
+}
+
+#brokersTableBody,
+#truckTableBody {
+    margin-top: 20px;
+}
+
+/* Additional styles for specific elements */
+.add-form label[for="flatbedLength"] {
+    width: calc(30% - 10px); /* Adjust the width for the Flatbed Length label */
+}
+
+#flatbedLengthContainer label[for="flatbedLength"] {
+    display: inline-block; /* Set label to inline-block to be on the same line */
+    vertical-align: top; /* Align label to the top of the line */
+    margin-bottom: 5px; /* Adjust margin if needed */
+}
+
+#flatbedLengthContainer {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline; /* Align items on the baseline */
+}
+
+#flatbedLengthContainer label {
+    width: calc(30% - 10px);
+    margin-bottom: 0; /* Remove the default bottom margin for labels */
+}
+
+#flatbedLength {
+    width: calc(70% - 10px);
+    padding: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* Header Styles */
+header {
+    background-color: #90adf5;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed; /* Change from relative to fixed */
+    top: 0; /* Set top to 0 for fixed positioning */
+    left: 0;
+    right: 0;
+    z-index: 2; /* Increase z-index to ensure it's above other content */
+}
+
+#siteTitle {
+    flex-grow: 1;
+    margin: 0;
+}
+
+nav {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    background-color: #444;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 25%;
+    z-index: 1;
+}
+
+nav a {
+    padding: 15px;
+    color: white;
+    text-decoration: none;
+}
+
+.hamburger {
+    display: block;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Style for the close (X) button inside the menu */
+.close-icon {
+    display: none;
+    cursor: pointer;
+    font-size: 20px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #90adf5;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

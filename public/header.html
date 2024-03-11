@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Header</title>
+</head>
+<body>
+
+  <!-- Header with navigation menu and hamburger button -->
+  <header>
+    <a href="/home"><img src="home.png" alt="Home"></a>
+    <h1 id="siteTitle">Truck Load Comparison</h1>
+    <span class="hamburger">&#9776;</span>
+  </header>
+
+  <!-- Hamburger menu -->
+  <nav>
+    <span class="close-icon">&#10006;</span>
+    <a href="/brokers">Brokers</a>
+    <a href="/load">Load</a>
+    <a href="/trucks">Trucks</a>
+    <a href="#" onclick="logout()">Log Out</a>
+  </nav>
+
+  <!-- Footer section -->
+  <footer>
+    Created by Amber McCully | Contact: <a href="mailto:amber.mccully@mymail.champlain.edu">amber.mccully@mymail.champlain.edu</a>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const hamburger = document.querySelector('.hamburger');
+      const closeIcon = document.querySelector('.close-icon');
+      const nav = document.querySelector('nav');
+
+      hamburger.addEventListener('click', function () {
+        nav.style.display = 'flex';
+        hamburger.style.display = 'none';
+        closeIcon.style.display = 'block';
+      });
+
+      closeIcon.addEventListener('click', function () {
+        nav.style.display = 'none';
+        hamburger.style.display = 'block';
+        closeIcon.style.display = 'none';
+      });
+
+      // Adjust title width dynamically on window resize
+      window.addEventListener('resize', function () {
+        h1.style.width = header.clientWidth - (hamburger.clientWidth + 30) + 'px';
+      });
+    });
+
+    // Function to log out
+    function logout() {
+      // Implement your log-out logic here, for example:
+      // Clear user session, redirect to login page, etc.
+      console.log('User logged out');
+
+      // Redirect to the login page
+      window.location.href = '/';
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brokers</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Check if the header has already been loaded -->
+  <script>
+    const isHeaderLoaded = document.querySelector('header');
+
+    if (!isHeaderLoaded) {
+      // Load and include the header dynamically
+      fetch('header.html')
+        .then(response => response.text())
+        .then(data => {
+          document.body.insertAdjacentHTML('afterbegin', data);
+
+          // Execute scripts within the inserted content
+          const scripts = document.querySelectorAll('script');
+          scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            newScript.text = script.text;
+            document.head.appendChild(newScript);
+          });
+
+          // Add event listener for the hamburger menu
+          const hamburger = document.querySelector('.hamburger');
+          const nav = document.querySelector('nav');
+
+          hamburger.addEventListener('click', function () {
+            nav.style.display = (getComputedStyle(nav).display === 'none') ? 'flex' : 'none';
+          });
+        });
+    }
+  </script>
+<br>
+<br>
+  <h1>Brokers</h1>
+
+  <!-- Add a form for adding a new broker -->
+  <h3>Add a New Broker</h3>
+  <form id="addBrokerForm" class="add-form">
+    <label for="newBrokerName">Name:</label>
+    <input type="text" id="newBrokerName" required>
+
+    <label for="newBrokerFactorable">Factorable:</label>
+    <select id="newBrokerFactorable" required>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+
+    <label for="newBrokerWorkWithAgain">Work With:</label>
+    <select id="newBrokerWorkWithAgain" required>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+
+    <label for="newBrokerNotes">Notes:</label>
+    <textarea id="newBrokerNotes" rows="4"></textarea>
+
+    <label for="newBrokerPOC">Point of Contact Name:</label>
+    <input type="text" id="newBrokerPOC">
+
+    <label for="newBrokerPOCNumber">POC Phone:</label>
+    <input type="text" id="newBrokerPOCNumber">
+
+    <label for="newBrokerPOCEmail">POC Email:</label>
+    <input type="text" id="newBrokerPOCEmail">
+
+    <button type="submit">Add Broker</button>
+  </form>
+
+  <!--Current Brokers-->
+  <h3>Current Brokers</h3>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Factorable</th>
+        <th>Work With</th>
+        <th>Notes</th>
+        <th>POC</th>
+        <th>POC Number</th>
+        <th>POC Email</th>
+      </tr>
+    </thead>
+    <tbody id="brokersTableBody"></tbody>
+  </table>
+
+  <script type="text/javascript">
+
+    // Fetch brokers data from the server
+    async function fetchBrokersData() {
+      try {
+        const response = await fetch('/api/brokers'); // Updated URL here
+        const data = await response.json();
+        displayBrokers(data);
+      } catch (error) {
+        console.error('Error fetching brokers data:', error);
+      }
+    }
+
+    // Display brokers data in the table
+    function displayBrokers(brokers) {
+      const tableBody = document.getElementById('brokersTableBody');
+
+      if (brokers.length === 0) {
+        // If no brokers, create a row with empty cells
+        const emptyRow = document.createElement('tr');
+        for (let i = 0; i < 7; i++) {
+          const emptyCell = document.createElement('td');
+          emptyRow.appendChild(emptyCell);
+        }
+        tableBody.appendChild(emptyRow);
+      } else {
+        // Display brokers in the table
+        brokers.forEach(broker => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${broker.Name}</td>
+            <td>${broker.Factorable}</td>
+            <td>${broker.WorkWithAgain}</td>
+            <td>${broker.Notes}</td>
+            <td>${broker.POC}</td>
+            <td>${broker.POCNumber}</td>
+            <td>${broker.POCEmail}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+    }
+
+    // Fetch brokers data when the page loads
+    window.addEventListener('load', () => {
+      fetchBrokersData();
+    });
+
+    // Add event listener for the form submission
+    const addBrokerForm = document.getElementById('addBrokerForm');
+    addBrokerForm.addEventListener('submit', addBroker);
+
+    // Function to handle adding a new broker
+    async function addBroker(event) {
+      event.preventDefault();
+
+      // Get values from the form
+      const newBrokerName = document.getElementById('newBrokerName').value;
+      const newBrokerFactorable = document.getElementById('newBrokerFactorable').value === 'true';
+      const newBrokerWorkWithAgain = document.getElementById('newBrokerWorkWithAgain').value === 'true';
+      const newBrokerNotes = document.getElementById('newBrokerNotes').value;
+      const newBrokerPOC = document.getElementById('newBrokerPOC').value;
+      const newBrokerPOCNumber = document.getElementById('newBrokerPOCNumber').value;
+      const newBrokerPOCEmail = document.getElementById('newBrokerPOCEmail').value;
+
+      try {
+        // Send data to the server for adding a new broker
+        const response = await fetch('/addBroker', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            Name: newBrokerName,
+            Factorable: newBrokerFactorable,
+            WorkWithAgain: newBrokerWorkWithAgain,
+            Notes: newBrokerNotes,
+            POC: newBrokerPOC,
+            POCNumber: newBrokerPOCNumber,
+            POCEmail: newBrokerPOCEmail,
+          }),
+        });
+
+        if (response.ok) {
+          console.log('Broker added successfully');
+          // Optionally, you can fetch and update the entire broker list here
+          fetchBrokersData();
+        } else {
+          console.error('Failed to add broker');
+        }
+      } catch (error) {
+        console.error('Error adding broker:', error);
+      }
+    }
+  </script>
+
+</body>
+</html>
