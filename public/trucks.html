@@ -7,11 +7,12 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <script>
-    // Check if the header has already been loaded
-    const isHeaderLoaded = document.querySelector('header');
 
-    if (!isHeaderLoaded) {
+  <!-- Check if the header has already been loaded -->
+  <script>
+    if (!window.headerLoaded) {
+      window.headerLoaded = true;
+
       // Load and include the header dynamically
       fetch('header.html')
         .then(response => response.text())
@@ -36,14 +37,12 @@
         });
     }
   </script>
-  <br>
-  <br>
+
   <h1>Trucks</h1>
 
   <!-- Add Truck Form -->
   <h3>Add New Truck</h3>
   <form id="addTruckForm" class="add-form">
-    <!-- Input fields for truck details -->
     <label for="year">Year:</label>
     <input type="text" id="year" name="year" required>
     <label for="make">Make:</label>
@@ -64,7 +63,7 @@
 
     <div id="flatbedLengthContainer" style="display: none;">
       <label for="flatbedLength">Flatbed Length:</label>
-      <input type="text" id="flatbedLength" name="flatbedLength" required>
+      <input type="text" id="flatbedLength" name="flatbedLength">
     </div>
     <label for="equipmentNumber">Equipment Number:</label>
     <input type="text" id="equipmentNumber" name="equipmentNumber" required>
@@ -73,7 +72,6 @@
     <label for="fuelCapacity">Fuel Capacity:</label>
     <input type="text" id="fuelCapacity" name="fuelCapacity" required>
 
-    <!-- Submit button for adding a truck -->
     <button type="submit">Add Truck</button>
   </form>
 
@@ -81,7 +79,6 @@
   <h3>Current Truck Information</h3>
   <table border="1">
     <thead>
-      <!-- Table header -->
       <tr>
         <th>Truck ID</th>
         <th>Year</th>
@@ -93,17 +90,12 @@
         <th>Equipment Number</th>
         <th>Fuel Mileage</th>
         <th>Fuel Capacity</th>
-        <th>Action</th>
       </tr>
     </thead>
-    <tbody id="truckTableBody">
-      <!-- Truck data will be displayed here -->
-    </tbody>
+    <tbody id="truckTableBody"></tbody>
   </table>
 
-  <!-- Script to fetch and display truck data -->
   <script>
-    // Function to toggle the display of flatbed length based on trailer type
     function toggleFlatbedLength() {
       const trailerSelect = document.getElementById('trailer');
       const flatbedLengthContainer = document.getElementById('flatbedLengthContainer');
@@ -115,67 +107,103 @@
       }
     }
 
-    // Function to fetch and display truck data
-    async function displayTrucks() {
-      const response = await fetch('/trucks');
-      const truckData = await response.json();
-
-      const truckTableBody = document.getElementById('truckTableBody');
-      truckTableBody.innerHTML = '';
-
-      truckData.forEach(truck => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${truck.TruckID}</td>
-          <td>${truck.Year}</td>
-          <td>${truck.Make}</td>
-          <td>${truck.Model}</td>
-          <td>${truck.Plate}</td>
-          <td>${truck.Trailer}</td>
-          <td>${truck.FlatbedLength}</td>
-          <td>${truck.EquipmentNumber}</td>
-          <td>${truck.FuelMileage}</td>
-          <td>${truck.FuelCapacity}</td>
-          <td><button onclick="updateTruck(${truck.TruckID})">Update</button></td>
-        `;
-        truckTableBody.appendChild(row);
-      });
+    async function fetchTrucksData() {
+      try {
+        const response = await fetch('/api/trucks');
+        const data = await response.json();
+        displayTrucks(data);
+      } catch (error) {
+        console.error('Error fetching trucks data:', error);
+      }
     }
 
-    // Function to handle form submission for adding a truck
-    document.getElementById('addTruckForm').addEventListener('submit', async function (event) {
-      event.preventDefault();
+    function displayTrucks(trucks) {
+      const tableBody = document.getElementById('truckTableBody');
+      tableBody.innerHTML = '';
 
-      const formData = new FormData(this);
-      const truckData = {};
-      formData.forEach((value, key) => {
-        truckData[key] = value;
-      });
-
-      const response = await fetch('/addTruck', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(truckData),
-      });
-
-      if (response.ok) {
-        console.log('Truck added successfully');
-        displayTrucks(); // Refresh the truck table
+      if (trucks.length === 0) {
+        const emptyRow = document.createElement('tr');
+        for (let i = 0; i < 10; i++) {
+          const emptyCell = document.createElement('td');
+          emptyRow.appendChild(emptyCell);
+        }
+        tableBody.appendChild(emptyRow);
       } else {
-        console.error('Failed to add truck');
+        trucks.forEach(truck => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${truck.TruckID}</td>
+            <td>${truck.Year}</td>
+            <td>${truck.Make}</td>
+            <td>${truck.Model}</td>
+            <td>${truck.Plate}</td>
+            <td>${truck.Trailer}</td>
+            <td>${truck.FlatbedLength}</td>
+            <td>${truck.EquipmentNumber}</td>
+            <td>${truck.FuelMileage}</td>
+            <td>${truck.FuelCapacity}</td>
+          `;
+          tableBody.appendChild(row);
+        });
       }
+    }
+
+    window.addEventListener('load', () => {
+      fetchTrucksData();
     });
 
-    // Function to handle truck update
-    function updateTruck(truckID) {
-      // Implement logic to update a specific truck, if needed
-      console.log('Updating truck with ID:', truckID);
+    // Check if addTruckForm is already defined before declaring it
+    if (!window.addTruckForm) {
+      const addTruckForm = document.getElementById('addTruckForm');
+      addTruckForm.addEventListener('submit', addTruck);
+      window.addTruckForm = addTruckForm;
     }
 
-    // Display trucks when the page loads
-    displayTrucks();
+    async function addTruck(event) {
+      event.preventDefault();
+
+      const year = document.getElementById('year').value;
+      const make = document.getElementById('make').value;
+      const model = document.getElementById('model').value;
+      const tareWeight = document.getElementById('tareWeight').value;
+      const plate = document.getElementById('plate').value;
+      const trailer = document.getElementById('trailer').value;
+      const flatbedLength = document.getElementById('flatbedLength').value;
+      const equipmentNumber = document.getElementById('equipmentNumber').value;
+      const fuelMileage = document.getElementById('fuelMileage').value;
+      const fuelCapacity = document.getElementById('fuelCapacity').value;
+
+      try {
+        const response = await fetch('/addTruck', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            year,
+            make,
+            model,
+            tareWeight,
+            plate,
+            trailer,
+            flatbedLength,
+            equipmentNumber,
+            fuelMileage,
+            fuelCapacity,
+          }),
+        });
+
+        if (response.ok) {
+          console.log('Truck added successfully');
+          fetchTrucksData();
+        } else {
+          console.error('Failed to add truck');
+        }
+      } catch (error) {
+        console.error('Error adding truck:', error);
+      }
+    }
   </script>
+
 </body>
 </html>

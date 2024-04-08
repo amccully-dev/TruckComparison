@@ -10,9 +10,9 @@
 
   <!-- Check if the header has already been loaded -->
   <script>
-    const isHeaderLoaded = document.querySelector('header');
+    if (!window.headerLoaded) {
+      window.headerLoaded = true;
 
-    if (!isHeaderLoaded) {
       // Load and include the header dynamically
       fetch('header.html')
         .then(response => response.text())
@@ -37,8 +37,8 @@
         });
     }
   </script>
-<br>
-<br>
+  <br>
+  <br>
   <h1>Brokers</h1>
 
   <!-- Add a form for adding a new broker -->
@@ -140,8 +140,10 @@
     });
 
     // Add event listener for the form submission
-    const addBrokerForm = document.getElementById('addBrokerForm');
-    addBrokerForm.addEventListener('submit', addBroker);
+    document.addEventListener('DOMContentLoaded', function () {
+      const addBrokerForm = document.getElementById('addBrokerForm');
+      addBrokerForm.addEventListener('submit', addBroker);
+    });
 
     // Function to handle adding a new broker
     async function addBroker(event) {

@@ -1,9 +1,55 @@
 /* Global Styles */
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 0;
+    padding: 70px 10px 50px 10px ;
+    background-color: #f0f0f0; /* Light grey background color */
 }
 
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    margin: 0;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.error-message {
+    color: red;
+    font-style: italic;
+}
+
+
+/*Login page */
+.login-container {
+    padding: 20px;
+}
+
+input[type="text"],
+input[type="password"],
+button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
 /* Forms on Broker and Truck pages */
 .add-form {
     border: 1px solid #ccc;
@@ -111,11 +157,11 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: fixed; /* Change from relative to fixed */
-    top: 0; /* Set top to 0 for fixed positioning */
+    position: fixed; 
+    top: 0; 
     left: 0;
     right: 0;
-    z-index: 2; /* Increase z-index to ensure it's above other content */
+    z-index: 2;
 }
 
 #siteTitle {
@@ -167,4 +213,5 @@ footer {
     bottom: 0;
     left: 0;
     right: 0;
+    margin-top: 10px;
 }

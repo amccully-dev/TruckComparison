@@ -4,86 +4,166 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Register</h1>
-  
-  <!-- Registration Form -->
-  <form id="registerForm">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
-    <br>
-    <label for="firstName">First Name:</label>
-    <input type="text" id="firstName" name="firstName" required>
-    <br>
-    <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" name="lastName" required>
-    <br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    <br>
-    <button type="submit">Register</button>
-  </form>
+  <div class="container">
+    <header>
+      <h1 id="siteTitle">Register</h1>
+    </header>
 
-  <!-- Error message display -->
-  <p id="errorMessage"></p>
+    <!-- Registration Form -->
+    <div class="login-container">
+      <form id="registerForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required="">
+        <br>
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" required="">
+        <br>
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" required="">
+        <br>
+        <label for="resetQuestion">Password Reset Question:</label>
+        <select id="resetQuestion" name="resetQuestion" required="">
+          <option value="" disabled="" selected="">Select a question</option>
+          <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+          <option value="What is the name of your first pet?">What is the name of your first pet?</option>
+        </select>
+        <br>
+        <label for="resetAnswer">Password Reset Answer:</label>
+        <input type="text" id="resetAnswer" name="resetAnswer" required="">
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required="" onfocus="showPasswordRequirements()" onblur="hidePasswordRequirements()">
+        <!-- Toggle visibility of password -->
+        <input type="checkbox" id="showPassword" onchange="togglePasswordVisibility()">
+        <label for="showPassword">Show Password</label>
+        <br>
+        <!-- Helper text for password requirements -->
+        <p id="passwordRequirements" style="display: none;">Password requirements: <br> 2 upper case letters, 2 lower case letters, 2 special characters, 2 numbers, 8-20 characters</p>
+        <button type="submit">Register</button>
+      </form>
 
-  <!-- Return to Login button -->
-  <button id="returnToLogin" onclick="location.href='/index.html'">Return to Login</button>
+      <!-- Error message display -->
+      <p id="errorMessage"></p>
 
-  <script>
-    // Event listener for the registration form submission
-    document.getElementById('registerForm').addEventListener('submit', async function (event) {
-      event.preventDefault();
+      <!-- Return to Login button -->
+      <button id="returnToLogin" onclick="location.href='/index.html'">Return to Login</button>
+    </div>
+  </div>
 
-      // Gather user input from the registration form
-      const username = document.getElementById('username').value;
-      const firstName = document.getElementById('firstName').value;
-      const lastName = document.getElementById('lastName').value;
-      const password = document.getElementById('password').value;
-
-      try {
-        // Send a registration request to the server
-        const response = await fetch('/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, firstName, lastName, password }),
-        });
-
-        if (response.ok) {
-          // Registration successful
-          console.log('Registration successful');
-
-          // Display a success message to the user
-          const successMessage = document.createElement('p');
-          successMessage.textContent = 'User successfully added! You can now log in.';
-          successMessage.style.color = 'green';
-
-          // Append the message to the form
-          const form = document.getElementById('registerForm');
-          form.insertAdjacentElement('afterend', successMessage);
+  <script src="scripts.js"></script>
+  <script> 
+      // Function to toggle password visibility
+      function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const checkbox = document.getElementById('showPassword');
+        if (checkbox.checked) {
+          passwordInput.type = 'text';
         } else {
-          // Registration failed, display an error message
-          const errorData = await response.json();
-          console.error('User registration failed:', errorData);
-
+          passwordInput.type = 'password';
+        }
+      }
+  
+      // Function to show password requirements
+      function showPasswordRequirements() {
+        const passwordRequirements = document.getElementById('passwordRequirements');
+        passwordRequirements.style.display = 'block';
+      }
+      
+      // Function to hide password requirements
+      function hidePasswordRequirements() {
+        const passwordRequirements = document.getElementById('passwordRequirements');
+        passwordRequirements.style.display = 'none';
+      }
+  
+      // Function to validate password requirements
+      function validatePassword(password) {
+        const upperCaseLetters = /[A-Z]/g;
+        const lowerCaseLetters = /[a-z]/g;
+        const specialCharacters = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g;
+        const numbers = /[0-9]/g;
+  
+        if (
+          password.length < 8 ||
+          password.length > 20 ||
+          !password.match(upperCaseLetters) ||
+          !password.match(lowerCaseLetters) ||
+          !password.match(specialCharacters) ||
+          !password.match(numbers)
+        ) {
+          return false;
+        }
+  
+        return true;
+      }
+  
+      // Event listener for the registration form submission
+      document.getElementById('registerForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+  
+        // Gather user input from the registration form
+        const username = document.getElementById('username').value;
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const password = document.getElementById('password').value;
+        const resetQuestion = document.getElementById('resetQuestion').value;
+        const resetAnswer = document.getElementById('resetAnswer').value;
+  
+        // Validate password
+        if (!validatePassword(password)) {
+          const errorMessage = document.getElementById('errorMessage');
+          errorMessage.textContent = 'Password does not meet requirements. Please ensure it has 2 upper case letters, 2 lower case letters, 2 special characters, 2 numbers, and is between 8-20 characters.';
+          errorMessage.style.color = 'red';
+          return;
+        }
+  
+        try {
+          // Send a registration request to the server
+          const response = await fetch('/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, firstName, lastName, password, resetQuestion, resetAnswer }),
+          });
+  
+          if (response.ok) {
+            // Registration successful
+            console.log('Registration successful');
+  
+            // Display a success message to the user
+            const successMessage = document.createElement('p');
+            successMessage.textContent = 'User successfully added! You can now log in.';
+            successMessage.style.color = 'green';
+  
+            // Append the message to the form
+            const form = document.getElementById('registerForm');
+            form.insertAdjacentElement('afterend', successMessage);
+          } else {
+            // Registration failed, display an error message
+            const errorData = await response.json();
+            console.error('User registration failed:', errorData);
+  
+            // Display error message on the page
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = `User registration failed. ${errorData.message || 'Please try again later.'}`;
+            errorMessage.style.color = 'red';
+          }
+        } catch (error) {
+          // Handle unexpected errors
+          console.error('An unexpected error occurred:', error);
+  
           // Display error message on the page
           const errorMessage = document.getElementById('errorMessage');
-          errorMessage.textContent = `User registration failed. ${errorData.message || 'Please try again later.'}`;
+          errorMessage.textContent = 'An unexpected error occurred. Please try again later.';
           errorMessage.style.color = 'red';
         }
-      } catch (error) {
-        // Handle unexpected errors
-        console.error('An unexpected error occurred:', error);
-
-        // Display error message on the page
-        const errorMessage = document.getElementById('errorMessage');
-        errorMessage.textContent = 'An unexpected error occurred. Please try again later.';
-        errorMessage.style.color = 'red';
-      }
-    });
-  </script>
+      });
+    </script>
 </body>
+<footer>
+  Created by Amber McCully | Contact: <a href="mailto:amber.mccully@mymail.champlain.edu">amber.mccully@mymail.champlain.edu</a>
+</footer>
 </html>

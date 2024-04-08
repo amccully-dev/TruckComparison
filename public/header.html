@@ -1,3 +1,4 @@
+<!-- header.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +21,8 @@
     <a href="/brokers">Brokers</a>
     <a href="/load">Load</a>
     <a href="/trucks">Trucks</a>
+    <a href="/weather">Weather</a>
+    <a href="/account">Account Management</a>
     <a href="#" onclick="logout()">Log Out</a>
   </nav>
 
@@ -54,12 +57,17 @@
 
     // Function to log out
     function logout() {
-      // Implement your log-out logic here, for example:
-      // Clear user session, redirect to login page, etc.
-      console.log('User logged out');
-
-      // Redirect to the login page
-      window.location.href = '/';
+      // Clear user session and redirect to the login page
+      fetch('/logout', { method: 'POST' })
+        .then(response => {
+          if (response.ok) {
+            console.log('User logged out');
+            window.location.href = '/'; // Redirect to the login page
+          } else {
+            console.error('Failed to log out');
+          }
+        })
+        .catch(error => console.error('Error logging out:', error));
     }
   </script>
 

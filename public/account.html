@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Management</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Check if the header has already been loaded -->
+  <script>
+    if (!window.headerLoaded) {
+      window.headerLoaded = true;
+
+      // Load and include the header dynamically
+      fetch('header.html')
+        .then(response => response.text())
+        .then(data => {
+          document.body.insertAdjacentHTML('afterbegin', data);
+
+          // Execute scripts within the inserted content
+          const scripts = document.querySelectorAll('script');
+          scripts.forEach(script => {
+            const newScript = document.createElement('script');
+            newScript.text = script.text;
+            document.head.appendChild(newScript);
+          });
+
+          // Add event listener for the hamburger menu
+          const hamburger = document.querySelector('.hamburger');
+          const nav = document.querySelector('nav');
+
+          hamburger.addEventListener('click', function () {
+            nav.style.display = (getComputedStyle(nav).display === 'none') ? 'flex' : 'none';
+          });
+        });
+    }
+  </script>
+  <!-- User information display and update form -->
+  <div class="user-info">
+    <h2>User Information</h2>
+    <p><strong>Username:</strong> <span id="username"></span></p>
+    <p><strong>First Name:</strong> <span id="firstName"></span></p>
+    <p><strong>Last Name:</strong> <span id="lastName"></span></p>
+    <button id="editButton">Edit Information</button>
+    <form id="updateForm" style="display: none;">
+      <label for="newFirstName">New First Name:</label>
+      <input type="text" id="newFirstName" name="newFirstName" required><br>
+      <label for="newLastName">New Last Name:</label>
+      <input type="text" id="newLastName" name="newLastName" required><br>
+      <button type="submit">Update</button>
+      <button type="button" id="cancelButton">Cancel</button>
+    </form>
+  </div>
+
+  <!-- Password Reset Form (with current password) -->
+  <div class="password-reset-container">
+    <h2>Password Reset </h2>
+    <form id="passwordResetWithCurrentForm">
+      <label for="currentPassword">Current Password:</label>
+      <input type="password" id="currentPassword" name="currentPassword" required><br>
+      <label for="newPasswordWithCurrent">New Password:</label>
+      <input type="password" id="newPasswordWithCurrent" name="newPasswordWithCurrent" required><br>
+      <button type="submit">Reset Password</button>
+    </form>
+  </div>
+
+  <!-- Password Reset Question and Answer Update Form -->
+  <div class="password-reset-update-container">
+    <h2>Password Reset Question and Answer Update</h2>
+    <form id="resetQuestionUpdateForm">
+      <label for="newResetQuestion">New Password Reset Question:</label>
+      <select id="resetQuestion" name="resetQuestion" required="">
+        <option value="" disabled="" selected="">Select a question</option>
+      </select><br>
+      <label for="newResetAnswer">New Password Reset Answer:</label>
+      <input type="text" id="newResetAnswer" name="newResetAnswer" required><br>
+      <button type="submit">Update</button>
+    </form>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

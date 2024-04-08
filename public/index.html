@@ -4,23 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Page</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Login</h1>
+  <div class="container">
+  <header>
+    <h1 id="siteTitle">Welcome To Load Comparison</h1>
+  </header>
   
   <!-- Login Form -->
-  <form id="loginForm">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
-    <br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    <br>
-    <button type="submit">Login</button>
-  </form>
-
-  <!-- Link to the registration page -->
-  <p>Don't have an account? <a href="/register">Register here</a>.</p>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <br>
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="/register">Register here</a>.</p>
+    <button onclick="location.href='/reset_password.html'">Reset Password</button>
+    <p id="errorMessage" class="error-message"></p>
+  </div>
+</div>
 
   <script>
     // Event listener for the login form submission
@@ -66,4 +74,7 @@
     });
   </script>
 </body>
+<footer>
+  Created by Amber McCully | Contact: <a href="mailto:amber.mccully@mymail.champlain.edu">amber.mccully@mymail.champlain.edu</a>
+</footer>
 </html>

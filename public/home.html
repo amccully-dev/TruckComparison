@@ -7,11 +7,11 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Check if the header has already been loaded -->
   <script>
-    // Check if the header has already been loaded
-    const isHeaderLoaded = document.querySelector('header');
+    if (!window.headerLoaded) {
+      window.headerLoaded = true;
 
-    if (!isHeaderLoaded) {
       // Load and include the header dynamically
       fetch('header.html')
         .then(response => response.text())
