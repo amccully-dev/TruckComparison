@@ -34,11 +34,13 @@
           hamburger.addEventListener('click', function () {
             nav.style.display = (getComputedStyle(nav).display === 'none') ? 'flex' : 'none';
           });
+
+          // Attach event listener for the update form
+          attachUpdateFormEventListener();
         });
     }
   </script>
-  <br>
-  <br>
+
   <h1>Brokers</h1>
 
   <!-- Add a form for adding a new broker -->
@@ -66,12 +68,46 @@
     <input type="text" id="newBrokerPOC">
 
     <label for="newBrokerPOCNumber">POC Phone:</label>
-    <input type="text" id="newBrokerPOCNumber">
+    <input type="text" id="newBrokerPOCNumber" placeholder="XXXXXXXXXX">
 
     <label for="newBrokerPOCEmail">POC Email:</label>
-    <input type="text" id="newBrokerPOCEmail">
+    <input type="text" id="newBrokerPOCEmail" placeholder="hello@gmail.com">
 
     <button type="submit">Add Broker</button>
+  </form>
+
+  <!-- Add a form for updating a broker -->
+  
+  <form id="updateBrokerForm" class="add-form" style="display: none;">
+    <h3>Update Broker</h3>
+    <label for="updateBrokerName">Name:</label>
+    <input type="text" id="updateBrokerName" required>
+
+    <label for="updateBrokerFactorable">Factorable:</label>
+    <select id="updateBrokerFactorable" required>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+
+    <label for="updateBrokerWorkWithAgain">Work With:</label>
+    <select id="updateBrokerWorkWithAgain" required>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+
+    <label for="updateBrokerNotes">Notes:</label>
+    <textarea id="updateBrokerNotes" rows="4"></textarea>
+
+    <label for="updateBrokerPOC">Point of Contact Name:</label>
+    <input type="text" id="updateBrokerPOC">
+
+    <label for="updateBrokerPOCNumber">POC Phone:</label>
+    <input type="text" id="updateBrokerPOCNumber" placeholder="XXXXXXXXXX">
+
+    <label for="updateBrokerPOCEmail">POC Email:</label>
+    <input type="text" id="updateBrokerPOCEmail" placeholder="hello@gmail.com">
+
+    <button type="submit">Update Broker</button>
   </form>
 
   <!--Current Brokers-->
@@ -86,6 +122,7 @@
         <th>POC</th>
         <th>POC Number</th>
         <th>POC Email</th>
+        <th>Action</th> 
       </tr>
     </thead>
     <tbody id="brokersTableBody"></tbody>
@@ -96,11 +133,14 @@
     // Fetch brokers data from the server
     async function fetchBrokersData() {
       try {
-        const response = await fetch('/api/brokers'); // Updated URL here
+        const response = await fetch('/api/brokers'); 
+        if (!response.ok) {
+          throw new Error('Failed to fetch brokers data. Please try again later.');
+        }
         const data = await response.json();
         displayBrokers(data);
       } catch (error) {
-        console.error('Error fetching brokers data:', error);
+        console.error('Error fetching brokers data:', error.message);
       }
     }
 
@@ -108,10 +148,13 @@
     function displayBrokers(brokers) {
       const tableBody = document.getElementById('brokersTableBody');
 
+      // Clear existing rows
+      tableBody.innerHTML = '';
+
       if (brokers.length === 0) {
         // If no brokers, create a row with empty cells
         const emptyRow = document.createElement('tr');
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 8; i++) {
           const emptyCell = document.createElement('td');
           emptyRow.appendChild(emptyCell);
         }
@@ -128,6 +171,10 @@
             <td>${broker.POC}</td>
             <td>${broker.POCNumber}</td>
             <td>${broker.POCEmail}</td>
+            <td>
+              <button onclick="updateBroker('${broker.ID}')">Update</button>
+              <button onclick="deleteBroker('${broker.ID}')">Delete</button>
+            </td>
           `;
           tableBody.appendChild(row);
         });
@@ -137,6 +184,7 @@
     // Fetch brokers data when the page loads
     window.addEventListener('load', () => {
       fetchBrokersData();
+      attachUpdateFormEventListener();
     });
 
     // Add event listener for the form submission
@@ -145,46 +193,163 @@
       addBrokerForm.addEventListener('submit', addBroker);
     });
 
-    // Function to handle adding a new broker
+    // Function to handle form submission and validate input fields
     async function addBroker(event) {
       event.preventDefault();
 
-      // Get values from the form
-      const newBrokerName = document.getElementById('newBrokerName').value;
-      const newBrokerFactorable = document.getElementById('newBrokerFactorable').value === 'true';
-      const newBrokerWorkWithAgain = document.getElementById('newBrokerWorkWithAgain').value === 'true';
-      const newBrokerNotes = document.getElementById('newBrokerNotes').value;
-      const newBrokerPOC = document.getElementById('newBrokerPOC').value;
-      const newBrokerPOCNumber = document.getElementById('newBrokerPOCNumber').value;
-      const newBrokerPOCEmail = document.getElementById('newBrokerPOCEmail').value;
-
       try {
+        // Validate Name
+        const newBrokerName = document.getElementById('newBrokerName').value;
+        if (!newBrokerName) {
+            throw new Error('Name is required.');
+        }
+
+        // Validate Factorable
+        const newBrokerFactorable = document.getElementById('newBrokerFactorable').value;
+        if (!newBrokerFactorable) {
+            throw new Error('Factorable value is required.');
+        }
+
+        // Validate Work With Again
+        const newBrokerWorkWithAgain = document.getElementById('newBrokerWorkWithAgain').value;
+        if (!newBrokerWorkWithAgain) {
+            throw new Error('Work With Again value is required.');
+        }
+
+        // Validate Point of Contact Name
+        const newBrokerPOC = document.getElementById('newBrokerPOC').value;
+        if (!newBrokerPOC) {
+            throw new Error('Point of Contact Name is required.');
+        }
+
+        // Validate POC Phone if it's not blank
+        const newBrokerPOCNumber = document.getElementById('newBrokerPOCNumber').value.trim();
+        if (newBrokerPOCNumber && !/^\d{10}$/.test(newBrokerPOCNumber)) {
+            throw new Error('Invalid POC Phone number format. Please enter a 10-digit number.');
+        }
+
+        // Validate POC Email if it's not blank
+        const newBrokerPOCEmail = document.getElementById('newBrokerPOCEmail').value.trim();
+        if (newBrokerPOCEmail && !/\S+@\S+\.\S+/.test(newBrokerPOCEmail)) {
+            throw new Error('Invalid POC Email format. Please enter a valid email address.');
+        }
+
         // Send data to the server for adding a new broker
         const response = await fetch('/addBroker', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            Name: newBrokerName,
-            Factorable: newBrokerFactorable,
-            WorkWithAgain: newBrokerWorkWithAgain,
-            Notes: newBrokerNotes,
-            POC: newBrokerPOC,
-            POCNumber: newBrokerPOCNumber,
-            POCEmail: newBrokerPOCEmail,
-          }),
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                Name: newBrokerName,
+                Factorable: newBrokerFactorable === 'true',
+                WorkWithAgain: newBrokerWorkWithAgain === 'true',
+                Notes: document.getElementById('newBrokerNotes').value,
+                POC: newBrokerPOC,
+                ...(newBrokerPOCNumber && { POCNumber: newBrokerPOCNumber }),
+                ...(newBrokerPOCEmail && { POCEmail: newBrokerPOCEmail }),
+            }),
         });
 
         if (response.ok) {
-          console.log('Broker added successfully');
-          // Optionally, you can fetch and update the entire broker list here
-          fetchBrokersData();
+            console.log('Broker added successfully');
+            // Reset the form after successful submission
+            event.target.reset(); // Reset the form
+            fetchBrokersData();
         } else {
-          console.error('Failed to add broker');
+            throw new Error('Failed to add broker. Please try again later.');
         }
       } catch (error) {
-        console.error('Error adding broker:', error);
+        console.error('Error adding broker:', error.message);
+      }
+    }
+
+    //Function to update Broker
+    async function updateBroker(brokerId) {
+      console.log('Update button clicked for broker ID:', brokerId);
+      // Show the update broker form
+      const updateForm = document.getElementById('updateBrokerForm');
+
+      try {
+        const response = await fetch(`/api/brokers/${brokerId}`); // Fetch broker details by ID
+        if (!response.ok) {
+          throw new Error('Failed to fetch broker details. Please try again later.');
+        }
+        const broker = await response.json();
+
+        // Populate the update form with broker details
+        document.getElementById('updateBrokerName').value = broker.Name;
+        document.getElementById('updateBrokerFactorable').value = broker.Factorable.toString();
+        document.getElementById('updateBrokerWorkWithAgain').value = broker.WorkWithAgain.toString();
+        document.getElementById('updateBrokerNotes').value = broker.Notes;
+        document.getElementById('updateBrokerPOC').value = broker.POC || '';
+        document.getElementById('updateBrokerPOCNumber').value = broker.POCNumber || '';
+        document.getElementById('updateBrokerPOCEmail').value = broker.POCEmail || '';
+        
+        // Set the broker ID as a data attribute in the form
+        updateForm.dataset.brokerId = brokerId;
+
+        // Display the update form
+      updateForm.style.display = 'flex';
+
+      } catch (error) {
+        console.error('Error fetching broker details:', error.message);
+      }
+    }
+
+    // Function to attach event listener for the update form
+    function attachUpdateFormEventListener() {
+      document.getElementById('updateBrokerForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const id = this.dataset.brokerId; // Retrieve the broker ID from the form's dataset
+        const data = {
+          Name: document.getElementById('updateBrokerName').value,
+          Factorable: document.getElementById('updateBrokerFactorable').value === 'true',
+          WorkWithAgain: document.getElementById('updateBrokerWorkWithAgain').value === 'true',
+          Notes: document.getElementById('updateBrokerNotes').value,
+          POC: document.getElementById('updateBrokerPOC').value,
+          POCNumber: document.getElementById('updateBrokerPOCNumber').value,
+          POCEmail: document.getElementById('updateBrokerPOCEmail').value
+        };
+
+        try {
+          const response = await fetch(`/api/brokers/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            console.log('Broker updated successfully');
+            // Optionally, you can fetch and update the entire broker list here
+            fetchBrokersData();
+          } else {
+            throw new Error('Failed to update broker. Please try again later.');
+          }
+        } catch (error) {
+          console.error('Error updating broker:', error.message);
+        }
+      });
+    }
+
+    // Function to handle deleting a broker
+    async function deleteBroker(brokerId) {
+      try {
+        const response = await fetch(`/deleteBroker/${brokerId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          console.log('Broker deleted successfully');
+          fetchBrokersData(); // Refresh the table after deletion
+        } else {
+          throw new Error('Failed to delete broker. Please try again later.');
+        }
+      } catch (error) {
+        console.error('Error deleting broker:', error.message);
       }
     }
   </script>

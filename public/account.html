@@ -42,43 +42,169 @@
     <p><strong>Username:</strong> <span id="username"></span></p>
     <p><strong>First Name:</strong> <span id="firstName"></span></p>
     <p><strong>Last Name:</strong> <span id="lastName"></span></p>
-    <button id="editButton">Edit Information</button>
-    <form id="updateForm" style="display: none;">
+    <button id="editInfoButton">Edit Information</button>
+    <form id="updateInfoForm" style="display: none;">
       <label for="newFirstName">New First Name:</label>
       <input type="text" id="newFirstName" name="newFirstName" required><br>
       <label for="newLastName">New Last Name:</label>
       <input type="text" id="newLastName" name="newLastName" required><br>
       <button type="submit">Update</button>
-      <button type="button" id="cancelButton">Cancel</button>
+      <button type="button" id="cancelInfoButton">Cancel</button>
     </form>
-  </div>
+    <hr>
+    <h2>Password Reset</h2>
+      <!-- Password Reset Form (with current password) -->
+      <div class="password-reset-container">
+        <h3>Reset Password</h3>
+        <form id="passwordResetWithCurrentForm">
+          <label for="currentPassword">Current Password:</label>
+          <input type="password" id="currentPassword" name="currentPassword" required><br>
+          <label for="newPasswordWithCurrent">New Password:</label>
+          <input type="password" id="newPasswordWithCurrent" name="newPasswordWithCurrent" required><br>
+          <button type="submit">Reset Password</button>
+        </form>
+      </div>
 
-  <!-- Password Reset Form (with current password) -->
-  <div class="password-reset-container">
-    <h2>Password Reset </h2>
-    <form id="passwordResetWithCurrentForm">
-      <label for="currentPassword">Current Password:</label>
-      <input type="password" id="currentPassword" name="currentPassword" required><br>
-      <label for="newPasswordWithCurrent">New Password:</label>
-      <input type="password" id="newPasswordWithCurrent" name="newPasswordWithCurrent" required><br>
-      <button type="submit">Reset Password</button>
-    </form>
-  </div>
+      <!-- Password Reset Question and Answer Update Form -->
+<div class="password-reset-update-container">
+  <h3>Update Password Reset Question and Answer</h3>
+  <form id="resetQuestionUpdateForm">
+    <label for="newQuestion">New Password Reset Question:</label>
+    <select id="newQuestion" name="newQuestion" required>
+      <option value="" disabled selected>Select a question</option>
+      <!-- Populate with available security questions -->
+    </select><br>
+    <label for="newAnswer">New Password Reset Answer:</label>
+    <input type="text" id="newAnswer" name="newAnswer" required><br>
+    <button type="submit">Update</button>
+  </form>
+</div>
 
-  <!-- Password Reset Question and Answer Update Form -->
-  <div class="password-reset-update-container">
-    <h2>Password Reset Question and Answer Update</h2>
-    <form id="resetQuestionUpdateForm">
-      <label for="newResetQuestion">New Password Reset Question:</label>
-      <select id="resetQuestion" name="resetQuestion" required="">
-        <option value="" disabled="" selected="">Select a question</option>
-      </select><br>
-      <label for="newResetAnswer">New Password Reset Answer:</label>
-      <input type="text" id="newResetAnswer" name="newResetAnswer" required><br>
-      <button type="submit">Update</button>
-    </form>
+    </div>
   </div>
 
   <script src="scripts.js"></script>
+  <script>
+    // Fetch user information from server and display it
+    async function displayUserInfo() {
+      try {
+        const response = await fetch('/getUserInfo'); // Adjust the URL as per your backend route
+        if (!response.ok) {
+          throw new Error('Failed to fetch user information');
+        }
+        const userData = await response.json();
+
+        // Populate user information into HTML elements
+        document.getElementById('username').textContent = userData.username;
+        document.getElementById('firstName').textContent = userData.firstName;
+        document.getElementById('lastName').textContent = userData.lastName;
+      } catch (error) {
+        console.error('An error occurred while fetching user information:', error);
+      }
+    }
+
+    // Call the function to display user information on page load
+    displayUserInfo();
+
+    // Toggle visibility of edit information form
+    document.getElementById('editInfoButton').addEventListener('click', function () {
+      const form = document.getElementById('updateInfoForm');
+      form.style.display = 'block';
+    });
+
+    // Cancel editing information
+    document.getElementById('cancelInfoButton').addEventListener('click', function () {
+      const form = document.getElementById('updateInfoForm');
+      form.style.display = 'none';
+    });
+
+ // Fetch password reset questions from server and populate the dropdown
+ async function populateResetQuestions() {
+      try {
+        const response = await fetch('/passwordResetQuestions');
+        if (!response.ok) {
+          throw new Error('Failed to fetch password reset questions');
+        }
+        const questions = await response.json();
+        const selectElement = document.getElementById('newQuestion');
+        selectElement.innerHTML = ''; // Clear existing options
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select a question';
+        selectElement.appendChild(defaultOption);
+        // Add fetched questions
+        questions.forEach(question => {
+          const option = document.createElement('option');
+          option.value = question;
+          option.textContent = question;
+          selectElement.appendChild(option);
+        });
+      } catch (error) {
+        console.error('An error occurred while fetching password reset questions:', error);
+      }
+    }
+    
+    // Call the function to populate password reset questions on page load
+    populateResetQuestions();
+
+    // Handle form submission for updating user information
+    document.getElementById('updateInfoForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const newFirstName = document.getElementById('newFirstName').value;
+      const newLastName = document.getElementById('newLastName').value;
+
+      try {
+        const response = await fetch('/updateUserInfo', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ newFirstName, newLastName }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update user information');
+        }
+
+        // Update displayed user information
+        document.getElementById('firstName').textContent = newFirstName;
+        document.getElementById('lastName').textContent = newLastName;
+
+        // Hide the update form
+        document.getElementById('updateInfoForm').style.display = 'none';
+      } catch (error) {
+        console.error('An error occurred while updating user information:', error);
+      }
+    });
+    // Handle form submission for updating security question and answer
+document.getElementById('resetQuestionUpdateForm').addEventListener('submit', async function (event) {
+  event.preventDefault();
+
+  const newQuestion = document.getElementById('newQuestion').value;
+  const newAnswer = document.getElementById('newAnswer').value;
+
+  try {
+    const response = await fetch('/updateSecurityQuestion', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newQuestion, newAnswer }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update security question and answer');
+    }
+
+    // Display success message or perform any necessary actions
+    console.log('Security question and answer updated successfully');
+  } catch (error) {
+    console.error('An error occurred while updating security question and answer:', error);
+  }
+});
+
+  </script>
 </body>
 </html>

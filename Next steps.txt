@@ -1,0 +1,26 @@
+Next steps
+
+use session ID to know user for accessing tables based on username
+	-fix all tables to only pull information related to current user
+	-when adding update all tables based on current user
+
+update elements on brokers table
+update elements on truck table
+delete item on brokers table
+delete item on truck table
+update trailer length to only allow 48 or 54 (choice)
+
+Load comparison table
+
+add look up broker by name
+format to add boxes
+do calculation
+add google api
+
+
+
+look at milage calculator
+
+build tables for overweight calculation
+
+add password reset to menu (Account management page)

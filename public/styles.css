@@ -94,6 +94,12 @@ button {
     background-color: #45a049;
 }
 
+#FlatbedLengthContainer , #updateFlatbedLengthContainer {
+    display: block;
+    margin-bottom: 5px;
+    width: 90%;
+}
+
 /* Table Styles */
 table {
     border-collapse: collapse;

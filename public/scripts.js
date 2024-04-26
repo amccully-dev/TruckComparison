@@ -1,16 +1,24 @@
 async function fetchTruckInfo() {
-    const plateNumber = document.getElementById('truckPlate').value;
+    const plateNumber = document.getElementById('truckPlate').value.trim(); // Trim any leading/trailing whitespace
+    if (!plateNumber) {
+        displayErrorMessage('Please enter a plate number.');
+        return;
+    }
     try {
         const response = await fetch(`/api/trucks?plate=${plateNumber}`);
         if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const truckInfo = await response.json();
-        // Display the truck information if found, otherwise display an error message
-        if (Object.keys(truckInfo).length === 0) {
-            displayErrorMessage('No truck found. Please check entered information.');
+            if (response.status === 404) {
+                displayErrorMessage('No truck found with the entered plate number.');
+            } else {
+                throw new Error('Network response was not ok');
+            }
         } else {
-            displayTruckInfo(truckInfo);
+            const truckInfo = await response.json();
+            if (Object.keys(truckInfo).length === 0) {
+                displayErrorMessage('No truck found with the entered plate number.');
+            } else {
+                displayTruckInfo(truckInfo);
+            }
         }
     } catch (error) {
         console.error('Error:', error);
@@ -19,32 +27,31 @@ async function fetchTruckInfo() {
 
 function displayTruckInfo(truckInfo) {
     const truckInfoDisplay = document.getElementById('truckInfoDisplay');
+    const errorMessageElement = document.getElementById('errorMessage');
+
+    // Display truck information
     truckInfoDisplay.innerHTML = `
         <p>Year: ${truckInfo.Year}</p>
         <p>Make: ${truckInfo.Make}</p>
         <p>Model: ${truckInfo.Model}</p>
         <p>Tare Weight: ${truckInfo.TareWeight}</p>
         <p>Trailer: ${truckInfo.Trailer}</p>
-        <p>Flatbed Length: ${truckInfo.FlatbedLength}</p>
+        ${truckInfo.Trailer === 'flatbed' ? `<p>Flatbed Length: ${truckInfo.FlatbedLength}</p>` : ''}
         <p>Equipment Number: ${truckInfo.EquipmentNumber}</p>
         <p>Fuel Mileage: ${truckInfo.FuelMileage}</p>
         <p>Fuel Capacity: ${truckInfo.FuelCapacity}</p>
     `;
+
+    // Clear any existing error message
+    errorMessageElement.textContent = '';
 }
+
 
 function displayErrorMessage(message) {
-    const truckInfoDisplay = document.getElementById('truckInfoDisplay');
-    truckInfoDisplay.innerHTML = `<p>${message}</p>`;
+    const errorMessageElement = document.getElementById('errorMessage');
+    errorMessageElement.textContent = message;
 }
 
-function toggleAddTruckForm() {
-    const addTruckFormContainer = document.getElementById('addTruckFormContainer');
-    if (addTruckFormContainer.style.display === 'none') {
-        addTruckFormContainer.style.display = 'block';
-    } else {
-        addTruckFormContainer.style.display = 'none';
-    }
-}
 
 function calculate() {
     // Get input values
@@ -97,45 +104,3 @@ function emptyTable() {
     }
 }
 
-function toggleFlatbedLength() {
-    const trailer = document.getElementById('trailer').value;
-    const flatbedLengthContainer = document.getElementById('flatbedLengthContainer');
-    if (trailer === 'flatbed') {
-        flatbedLengthContainer.style.display = 'block';
-    } else {
-        flatbedLengthContainer.style.display = 'none';
-    }
-}
-
-// Fetch password reset questions from server and populate the dropdown
-async function populateResetQuestions() {
-    try {
-      const response = await fetch('/passwordResetQuestions');
-      if (!response.ok) {
-        throw new Error('Failed to fetch password reset questions');
-      }
-      const questions = await response.json();
-      const selectElement = document.getElementById('resetQuestion');
-      selectElement.innerHTML = ''; // Clear existing options
-      // Add default option
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Select a question';
-      selectElement.appendChild(defaultOption);
-      // Add fetched questions
-      questions.forEach(question => {
-        const option = document.createElement('option');
-        option.value = question;
-        option.textContent = question;
-        selectElement.appendChild(option);
-      });
-    } catch (error) {
-      console.error('An error occurred while fetching password reset questions:', error);
-    }
-  }
-  
-  // Call the function to populate password reset questions on page load
-  populateResetQuestions();
-  
-  
-  

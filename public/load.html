@@ -36,104 +36,62 @@
         });
     }
   </script>
-      <h1>Load Comparison</h1>
-      
-      <div id="truckInfo">
-          <h2>Truck Information</h2>
-          <label for="truckPlate">Truck Plate:</label>
-<input type="text" id="truckPlate" name="truckPlate">
-
-          <button onclick="fetchTruckInfo()">Fetch Truck Info</button>
-          <div id="truckInfoDisplay"></div>
-      </div>
-      <!-- Button to open the truck add form -->
-<button onclick="toggleAddTruckForm()">Add New Truck</button>
-
-<!-- Add Truck Form (initially hidden) -->
-<div id="addTruckFormContainer" style="display: none;">
-  <h3>Add New Truck</h3>
-  <form id="addTruckForm" class="add-form">
-    <!-- Input fields for truck details -->
-    <label for="year">Year:</label>
-    <input type="text" id="year" name="year" required>
-    <label for="make">Make:</label>
-    <input type="text" id="make" name="make" required>
-    <label for="model">Model:</label>
-    <input type="text" id="model" name="model" required>
-    <label for="tareWeight">Tare Weight:</label>
-    <input type="number" id="tareWeight" name="tareWeight" required>
-    <label for="plate">Plate:</label>
-    <input type="text" id="plate" name="plate" required>
-    <label for="trailer">Trailer:</label>
-    <select id="trailer" name="trailer" required onchange="toggleFlatbedLength()">
-      <option value="dump">Dump</option>
-      <option value="flatbed">Flatbed</option>
-      <option value="low-boy">Low Boy</option>
-      <option value="refer">Refer</option>
-    </select>
-
-    <div id="flatbedLengthContainer" style="display: none;">
-      <label for="flatbedLength">Flatbed Length:</label>
-      <input type="text" id="flatbedLength" name="flatbedLength">
-    </div>
-    <label for="equipmentNumber">Equipment Number:</label>
-    <input type="text" id="equipmentNumber" name="equipmentNumber" required>
-    <label for="fuelMileage">Fuel Mileage:</label>
-    <input type="text" id="fuelMileage" name="fuelMileage" required>
-    <label for="fuelCapacity">Fuel Capacity:</label>
-    <input type="text" id="fuelCapacity" name="fuelCapacity" required>
-
-    <!-- Submit button for adding a truck -->
-    <button type="submit">Add Truck</button>
-  </form>
-</div>
-
-      <div id="calculation">
-          <h2>Calculation</h2>
-          <label for="loadType">Load Type:</label>
-          <select id="loadType" name="loadType">
-              <option value="partial">Partial</option>
-              <option value="full">Full</option>
-          </select><br>
-          <label for="pickUps">Number of Pick Ups:</label>
-          <input type="number" id="pickUps" name="pickUps"><br>
-          <label for="dropOffs">Number of Drop Offs:</label>
-          <input type="number" id="dropOffs" name="dropOffs"><br>
-          <label for="price">Price:</label>
-          <input type="number" id="price" name="price"><br>
-          <label for="weight">Weight:</label>
-          <input type="number" id="weight" name="weight"><br>
-          <label for="mileage">Mileage:</label>
-          <input type="number" id="mileage" name="mileage"><br>
-          <button onclick="calculate()">Calculate</button>
-      </div>
-      
-      <div id="loadComparison">
-          <h2>Load Comparison</h2>
-          <table id="comparisonTable">
-              <thead>
-                  <tr>
-                      <th>Load Type</th>
-                      <th>Pick Ups</th>
-                      <th>Drop Offs</th>
-                      <th>Price</th>
-                      <th>Weight</th>
-                      <th>Mileage</th>
-                      <th>Fuel Cost</th>
-                      <th>Total Price</th>
-                      <th>Profit</th>
-                      <th>Total Weight</th>
-                  </tr>
-              </thead>
-              <tbody id="comparisonTableBody">
-                  <!-- Table rows will be dynamically added here -->
-              </tbody>
-          </table>
-          <button onclick="addLoad()">Add Another Load</button>
-          <button onclick="emptyTable()">Empty Table</button>
-      </div>
+  <h1>Load Comparison</h1>
   
-      <script src="scripts.js"></script>
-  </body>
-  </html>
+  <div id="truckInfo">
+    <h2>Truck Information</h2>
+    <label for="truckPlate">Truck Plate:</label>
+    <input type="text" id="truckPlate" name="truckPlate">
+    <button onclick="fetchTruckInfo()">Fetch Truck Info</button>
+    <div id="truckInfoDisplay"></div>
+  </div>
+  <div id="errorMessage"></div>
+
+  <div id="calculation">
+    <h2>Calculation</h2>
+    <label for="loadType">Load Type:</label>
+    <select id="loadType" name="loadType">
+      <option value="partial">Partial</option>
+      <option value="full">Full</option>
+    </select><br>
+    <label for="pickUps">Number of Pick Ups:</label>
+    <input type="number" id="pickUps" name="pickUps"><br>
+    <label for="dropOffs">Number of Drop Offs:</label>
+    <input type="number" id="dropOffs" name="dropOffs"><br>
+    <label for="price">Price:</label>
+    <input type="number" id="price" name="price"><br>
+    <label for="weight">Weight:</label>
+    <input type="number" id="weight" name="weight"><br>
+    <label for="mileage">Mileage:</label>
+    <input type="number" id="mileage" name="mileage"><br>
+    <button onclick="calculate()">Calculate</button>
+  </div>
   
+  <div id="loadComparison">
+    <h2>Load Comparison</h2>
+    <table id="comparisonTable">
+      <thead>
+        <tr>
+          <th>Load Type</th>
+          <th>Pick Ups</th>
+          <th>Drop Offs</th>
+          <th>Price</th>
+          <th>Weight</th>
+          <th>Mileage</th>
+          <th>Fuel Cost</th>
+          <th>Total Price</th>
+          <th>Profit</th>
+          <th>Total Weight</th>
+        </tr>
+      </thead>
+      <tbody id="comparisonTableBody">
+        
+      </tbody>
+    </table>
+    <button onclick="addLoad()">Add Another Load</button>
+    <button onclick="emptyTable()">Empty Table</button>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

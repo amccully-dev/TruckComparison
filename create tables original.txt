@@ -1,0 +1,129 @@
+CREATE TABLE State (
+    StateID INT PRIMARY KEY IDENTITY(1,1),
+    StateName NVARCHAR(50) UNIQUE 
+);
+
+
+CREATE TABLE TruckInfo (
+    TruckID INT IDENTITY(1,1) PRIMARY KEY,
+    Year CHAR(4),
+    Make VARCHAR(15),
+    Model VARCHAR(15),
+    TareWeight NUMERIC,
+    Plate CHAR(10),
+    Trailer VARCHAR(15) CHECK (Trailer IN ('flatbed', 'low-boy', 'refer', 'dump')),
+    FlatbedLength CHAR(4),
+    EquipmentNumber CHAR(5),
+    FuelMileage CHAR(3),
+    FuelCapacity CHAR(4)
+);
+
+
+CREATE TABLE Brokers (
+    Name VARCHAR(50),
+    Factorable BIT,
+    WorkWithAgain BIT,
+    Notes VARCHAR(100),
+    POC VARCHAR(50),
+    POCNumber CHAR(15),
+    POCEmail VARCHAR(50),
+    PRIMARY KEY (Name)
+);
+
+CREATE TABLE LoadComparison (
+    PartialOrFull BIT,
+    PickUpNumber INT,
+    DropNumber INT,
+    Price CHAR(10),
+    LoadWeight NUMERIC,
+    Mileage CHAR(6),
+    FuelCost NUMERIC,
+    TotalPrice NUMERIC,
+    Profit NUMERIC,
+    TotalWeight NUMERIC,
+    PRIMARY KEY (PickUpNumber, DropNumber)
+);
+
+CREATE TABLE LoadStateCrossing (
+    LoadID INT,
+    StateID INT,
+    PRIMARY KEY (LoadID, StateID),
+    FOREIGN KEY (LoadID, StateID) REFERENCES LoadComparison(PickUpNumber, DropNumber),
+    FOREIGN KEY (StateID) REFERENCES State(StateID)
+);
+
+
+CREATE TABLE StatePermit (
+    StateID INT,
+    Type VARCHAR(15),
+    Link VARCHAR(255),
+    Mileage NUMERIC,
+    Cost NUMERIC,
+    PRIMARY KEY (StateID, Type),
+    FOREIGN KEY (StateID) REFERENCES State(StateID)
+);
+
+CREATE TABLE OversizePermit (
+    StateID INT,
+    Link VARCHAR(255),
+    Cost NUMERIC,
+    Weight NUMERIC,
+    PRIMARY KEY (StateID),
+    FOREIGN KEY (StateID) REFERENCES State(StateID)
+);
+
+-- Create a schema for the UDFs
+CREATE SCHEMA utility;
+GO
+
+-- Create a UDF to count uppercase letters in a string
+CREATE FUNCTION utility.CountUpperCaseLetters(@inputString NVARCHAR(MAX))
+RETURNS INT
+AS
+BEGIN
+    RETURN (SELECT LEN(@inputString) - LEN(REPLACE(@inputString, UPPER(@inputString), '')))
+END;
+GO
+
+-- Create a UDF to count lowercase letters in a string
+CREATE FUNCTION utility.CountLowerCaseLetters(@inputString NVARCHAR(MAX))
+RETURNS INT
+AS
+BEGIN
+    RETURN (SELECT LEN(@inputString) - LEN(REPLACE(@inputString, LOWER(@inputString), '')))
+END;
+GO
+
+-- Create a UDF to count numbers in a string
+CREATE FUNCTION utility.CountNumbers(@inputString NVARCHAR(MAX))
+RETURNS INT
+AS
+BEGIN
+    RETURN (SELECT LEN(@inputString) - LEN(REPLACE(@inputString, '0123456789', '')))
+END;
+GO
+
+-- Create a UDF to count special characters in a string
+CREATE FUNCTION utility.CountSpecialCharacters(@inputString NVARCHAR(MAX))
+RETURNS INT
+AS
+BEGIN
+    RETURN (SELECT LEN(@inputString) - LEN(REPLACE(@inputString, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', '')))
+END;
+GO
+
+-- Create the User table with password complexity checks
+CREATE TABLE [User] (
+    Username VARCHAR(20),
+    FirstName VARCHAR(20),
+    LastName VARCHAR(20),
+    PasswordHash NVARCHAR(255),
+    PRIMARY KEY (Username),
+    CHECK (
+        LEN(PasswordHash) BETWEEN 10 AND 20 AND
+        utility.CountUpperCaseLetters(PasswordHash) >= 2 AND -- At least 2 uppercase letters
+        utility.CountLowerCaseLetters(PasswordHash) >= 2 AND -- At least 2 lowercase letters
+        utility.CountNumbers(PasswordHash) >= 2 AND -- At least 2 numbers
+        utility.CountSpecialCharacters(PasswordHash) >= 2 -- At least 2 special characters
+    )
+);

@@ -1,6 +1,7 @@
 USE [master]
 GO
-/****** Object:  Database [TruckComparison]    Script Date: 3/11/2024 5:56:46 AM ******/
+
+/****** Object:  Database [TruckComparison]    Script Date: 4/26/2024 4:36:15 AM ******/
 CREATE DATABASE [TruckComparison]
  CONTAINMENT = NONE
  ON  PRIMARY 
@@ -9,316 +10,110 @@ CREATE DATABASE [TruckComparison]
 ( NAME = N'TruckComparison_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.SQLEXPRESS\MSSQL\DATA\TruckComparison_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
  WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
 GO
-ALTER DATABASE [TruckComparison] SET COMPATIBILITY_LEVEL = 160
-GO
+
 IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
 begin
 EXEC [TruckComparison].[dbo].[sp_fulltext_database] @action = 'enable'
 end
 GO
+
 ALTER DATABASE [TruckComparison] SET ANSI_NULL_DEFAULT OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET ANSI_NULLS OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET ANSI_PADDING OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET ANSI_WARNINGS OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET ARITHABORT OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET AUTO_CLOSE OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET AUTO_SHRINK OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET AUTO_UPDATE_STATISTICS ON 
 GO
+
 ALTER DATABASE [TruckComparison] SET CURSOR_CLOSE_ON_COMMIT OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET CURSOR_DEFAULT  GLOBAL 
 GO
+
 ALTER DATABASE [TruckComparison] SET CONCAT_NULL_YIELDS_NULL OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET NUMERIC_ROUNDABORT OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET QUOTED_IDENTIFIER OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET RECURSIVE_TRIGGERS OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET  DISABLE_BROKER 
 GO
+
 ALTER DATABASE [TruckComparison] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET DATE_CORRELATION_OPTIMIZATION OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET TRUSTWORTHY OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET ALLOW_SNAPSHOT_ISOLATION OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET PARAMETERIZATION SIMPLE 
 GO
+
 ALTER DATABASE [TruckComparison] SET READ_COMMITTED_SNAPSHOT OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET HONOR_BROKER_PRIORITY OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET RECOVERY SIMPLE 
 GO
+
 ALTER DATABASE [TruckComparison] SET  MULTI_USER 
 GO
+
 ALTER DATABASE [TruckComparison] SET PAGE_VERIFY CHECKSUM  
 GO
+
 ALTER DATABASE [TruckComparison] SET DB_CHAINING OFF 
 GO
+
 ALTER DATABASE [TruckComparison] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
 GO
+
 ALTER DATABASE [TruckComparison] SET TARGET_RECOVERY_TIME = 60 SECONDS 
 GO
+
 ALTER DATABASE [TruckComparison] SET DELAYED_DURABILITY = DISABLED 
 GO
+
 ALTER DATABASE [TruckComparison] SET ACCELERATED_DATABASE_RECOVERY = OFF  
 GO
+
 ALTER DATABASE [TruckComparison] SET QUERY_STORE = ON
 GO
+
 ALTER DATABASE [TruckComparison] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
 GO
-USE [TruckComparison]
-GO
-/****** Object:  User [truck_user]    Script Date: 3/11/2024 5:56:46 AM ******/
-CREATE USER [truck_user] FOR LOGIN [truck_user] WITH DEFAULT_SCHEMA=[dbo]
-GO
-ALTER ROLE [db_owner] ADD MEMBER [truck_user]
-GO
-/****** Object:  Schema [utility]    Script Date: 3/11/2024 5:56:46 AM ******/
-CREATE SCHEMA [utility]
-GO
-/****** Object:  UserDefinedFunction [utility].[CountLowerCaseLetters]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 
--- Create a UDF to count lowercase letters in a string
-CREATE FUNCTION [utility].[CountLowerCaseLetters](@inputString NVARCHAR(MAX))
-RETURNS INT
-AS
-BEGIN
-    RETURN (SELECT LEN(@inputString) - LEN(REPLACE(@inputString, LOWER(@inputString), '')))
-END;
-GO
-/****** Object:  UserDefinedFunction [utility].[CountNumbers]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
--- Create a UDF to count numbers in a string
-CREATE FUNCTION [utility].[CountNumbers](@inputString NVARCHAR(MAX))
-RETURNS INT
-AS
-BEGIN
-    RETURN (SELECT LEN(@inputString) - LEN(REPLACE(@inputString, '0123456789', '')))
-END;
-GO
-/****** Object:  UserDefinedFunction [utility].[CountSpecialCharacters]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
--- Create a UDF to count special characters in a string
-CREATE FUNCTION [utility].[CountSpecialCharacters](@inputString NVARCHAR(MAX))
-RETURNS INT
-AS
-BEGIN
-    RETURN (SELECT LEN(@inputString) - LEN(REPLACE(@inputString, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', '')))
-END;
-GO
-/****** Object:  UserDefinedFunction [utility].[CountUpperCaseLetters]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
--- Create a UDF to count uppercase letters in a string
-CREATE FUNCTION [utility].[CountUpperCaseLetters](@inputString NVARCHAR(MAX))
-RETURNS INT
-AS
-BEGIN
-    RETURN (SELECT LEN(@inputString) - LEN(REPLACE(@inputString, UPPER(@inputString), '')))
-END;
-GO
-/****** Object:  Table [dbo].[Brokers]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Brokers](
-	[Name] [varchar](50) NOT NULL,
-	[Factorable] [bit] NULL,
-	[WorkWithAgain] [bit] NULL,
-	[Notes] [varchar](100) NULL,
-	[POC] [varchar](50) NULL,
-	[POCNumber] [char](15) NULL,
-	[POCEmail] [varchar](50) NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[Name] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[LoadComparison]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[LoadComparison](
-	[PartialOrFull] [bit] NULL,
-	[PickUpNumber] [int] NOT NULL,
-	[DropNumber] [int] NOT NULL,
-	[Price] [char](10) NULL,
-	[LoadWeight] [numeric](18, 0) NULL,
-	[Mileage] [char](6) NULL,
-	[FuelCost] [numeric](18, 0) NULL,
-	[TotalPrice] [numeric](18, 0) NULL,
-	[Profit] [numeric](18, 0) NULL,
-	[TotalWeight] [numeric](18, 0) NULL,
-	[TruckID] [int] NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[PickUpNumber] ASC,
-	[DropNumber] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[LoadStateCrossing]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[LoadStateCrossing](
-	[LoadID] [int] NOT NULL,
-	[StateID] [int] NOT NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[LoadID] ASC,
-	[StateID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[OversizePermit]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[OversizePermit](
-	[StateID] [int] NOT NULL,
-	[Link] [varchar](255) NULL,
-	[Cost] [numeric](18, 0) NULL,
-	[Weight] [numeric](18, 0) NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[StateID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[State]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[State](
-	[StateID] [int] IDENTITY(1,1) NOT NULL,
-	[StateName] [nvarchar](50) NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[StateID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
- CONSTRAINT [UQ_StateName] UNIQUE NONCLUSTERED 
-(
-	[StateName] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[StatePermit]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[StatePermit](
-	[StateID] [int] NOT NULL,
-	[Type] [varchar](15) NOT NULL,
-	[Link] [varchar](255) NULL,
-	[Mileage] [numeric](18, 0) NULL,
-	[Cost] [numeric](18, 0) NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[StateID] ASC,
-	[Type] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[TruckInfo]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[TruckInfo](
-	[TruckID] [int] IDENTITY(1,1) NOT NULL,
-	[Year] [char](4) NULL,
-	[Make] [varchar](15) NULL,
-	[Model] [varchar](15) NULL,
-	[TareWeight] [numeric](18, 0) NULL,
-	[Plate] [char](10) NULL,
-	[Trailer] [varchar](15) NULL,
-	[FlatbedLength] [char](4) NULL,
-	[EquipmentNumber] [char](5) NULL,
-	[FuelMileage] [char](3) NULL,
-	[FuelCapacity] [char](4) NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[TruckID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[User]    Script Date: 3/11/2024 5:56:46 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[User](
-	[Username] [varchar](20) NOT NULL,
-	[FirstName] [varchar](20) NULL,
-	[LastName] [varchar](20) NULL,
-	[PasswordHash] [nvarchar](255) NULL,
-	[TruckID] [int] NULL,
-PRIMARY KEY CLUSTERED 
-(
-	[Username] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-ALTER TABLE [dbo].[LoadComparison]  WITH CHECK ADD FOREIGN KEY([TruckID])
-REFERENCES [dbo].[TruckInfo] ([TruckID])
-GO
-ALTER TABLE [dbo].[LoadStateCrossing]  WITH CHECK ADD FOREIGN KEY([StateID])
-REFERENCES [dbo].[State] ([StateID])
-GO
-ALTER TABLE [dbo].[LoadStateCrossing]  WITH CHECK ADD FOREIGN KEY([LoadID], [StateID])
-REFERENCES [dbo].[LoadComparison] ([PickUpNumber], [DropNumber])
-GO
-ALTER TABLE [dbo].[OversizePermit]  WITH CHECK ADD FOREIGN KEY([StateID])
-REFERENCES [dbo].[State] ([StateID])
-GO
-ALTER TABLE [dbo].[StatePermit]  WITH CHECK ADD FOREIGN KEY([StateID])
-REFERENCES [dbo].[State] ([StateID])
-GO
-ALTER TABLE [dbo].[User]  WITH CHECK ADD FOREIGN KEY([TruckID])
-REFERENCES [dbo].[TruckInfo] ([TruckID])
-GO
-ALTER TABLE [dbo].[TruckInfo]  WITH CHECK ADD  CONSTRAINT [CK_TruckInfo_Trailer] CHECK  (([Trailer]='dump' OR [Trailer]='refer' OR [Trailer]='low-boy' OR [Trailer]='flatbed'))
-GO
-ALTER TABLE [dbo].[TruckInfo] CHECK CONSTRAINT [CK_TruckInfo_Trailer]
-GO
-USE [master]
-GO
 ALTER DATABASE [TruckComparison] SET  READ_WRITE 
 GO
+
+

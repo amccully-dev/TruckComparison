@@ -43,44 +43,78 @@
   <!-- Add Truck Form -->
   <h3>Add New Truck</h3>
   <form id="addTruckForm" class="add-form">
-    <label for="year">Year:</label>
-    <input type="text" id="year" name="year" required>
-    <label for="make">Make:</label>
-    <input type="text" id="make" name="make" required>
-    <label for="model">Model:</label>
-    <input type="text" id="model" name="model" required>
-    <label for="tareWeight">Tare Weight:</label>
-    <input type="number" id="tareWeight" name="tareWeight" required>
-    <label for="plate">Plate:</label>
-    <input type="text" id="plate" name="plate" required>
-    <label for="trailer">Trailer:</label>
-    <select id="trailer" name="trailer" required onchange="toggleFlatbedLength()">
-      <option value="dump">Dump</option>
-      <option value="flatbed">Flatbed</option>
-      <option value="low-boy">Low Boy</option>
-      <option value="refer">Refer</option>
+    <label for="Year">Year:</label>
+    <input type="text" id="Year" name="Year" required>
+    <label for="Make">Make:</label>
+    <input type="text" id="Make" name="Make" required>
+    <label for="Model">Model:</label>
+    <input type="text" id="Model" name="Model" required>
+    <label for="TareWeight">Tare Weight:</label>
+    <input type="number" id="TareWeight" name="TareWeight" required>
+    <label for="Plate">Plate:</label>
+    <input type="text" id="Plate" name="Plate" required>
+    <label for="Trailer">Trailer:</label>
+    <select id="Trailer" name="Trailer" required onchange="toggleFlatbedLength(this)">
+      <option value="Dump">Dump</option>
+      <option value="Flatbed">Flatbed</option>
+      <option value="Low-boy">Low Boy</option>
+      <option value="Refer">Refer</option>
     </select>
 
-    <div id="flatbedLengthContainer" style="display: none;">
-      <label for="flatbedLength">Flatbed Length:</label>
-      <input type="text" id="flatbedLength" name="flatbedLength">
+    <div id="FlatbedLengthContainer" style="display: none;">
+      <label for="FlatbedLength">Flatbed Length:</label>
+      <input type="text" id="FlatbedLength" name="FlatbedLength">
     </div>
-    <label for="equipmentNumber">Equipment Number:</label>
-    <input type="text" id="equipmentNumber" name="equipmentNumber" required>
-    <label for="fuelMileage">Fuel Mileage:</label>
-    <input type="text" id="fuelMileage" name="fuelMileage" required>
-    <label for="fuelCapacity">Fuel Capacity:</label>
-    <input type="text" id="fuelCapacity" name="fuelCapacity" required>
+    <label for="EquipmentNumber">Equipment Number:</label>
+    <input type="text" id="EquipmentNumber" name="EquipmentNumber" required>
+    <label for="FuelMileage">Fuel Mileage:</label>
+    <input type="text" id="FuelMileage" name="FuelMileage" required>
+    <label for="FuelCapacity">Fuel Capacity:</label>
+    <input type="text" id="FuelCapacity" name="FuelCapacity" required>
 
     <button type="submit">Add Truck</button>
   </form>
+
+    <!-- Update Truck Form -->
+    <h3>Update Truck</h3>
+    <form id="updateTruckForm" class="add-form" style="display: none;">
+      <label for="updateYear">Year:</label>
+      <input type="text" id="updateYear" name="Year" required>
+      <label for="updateMake">Make:</label>
+      <input type="text" id="updateMake" name="Make" required>
+      <label for="updateModel">Model:</label>
+      <input type="text" id="updateModel" name="Model" required>
+      <label for="updateTareWeight">Tare Weight:</label>
+      <input type="number" id="updateTareWeight" name="TareWeight" required>
+      <label for="updatePlate">Plate:</label>
+      <input type="text" id="updatePlate" name="Plate" required>
+      <label for="updateTrailer">Trailer:</label>
+      <select id="updateTrailer" name="updateTrailer" required onchange="toggleFlatbedLength(this)">
+        <option value="Dump">Dump</option>
+        <option value="Flatbed">Flatbed</option>
+        <option value="Low-boy">Low Boy</option>
+        <option value="Refer">Refer</option>
+      </select>
+  
+      <div id="updateFlatbedLengthContainer" style="display: none;">
+        <label for="updateFlatbedLength">Flatbed Length:</label>
+        <input type="text" id="updateFlatbedLength" name="FlatbedLength">
+      </div>
+      <label for="updateEquipmentNumber">Equipment Number:</label>
+      <input type="text" id="updateEquipmentNumber" name="EquipmentNumber" required>
+      <label for="updateFuelMileage">Fuel Mileage:</label>
+      <input type="text" id="updateFuelMileage" name="FuelMileage" required>
+      <label for="updateFuelCapacity">Fuel Capacity:</label>
+      <input type="text" id="updateFuelCapacity" name="FuelCapacity" required>
+  
+      <button type="submit">Update Truck</button>
+    </form>
 
   <!-- Display Truck Table -->
   <h3>Current Truck Information</h3>
   <table border="1">
     <thead>
       <tr>
-        <th>Truck ID</th>
         <th>Year</th>
         <th>Make</th>
         <th>Model</th>
@@ -90,38 +124,50 @@
         <th>Equipment Number</th>
         <th>Fuel Mileage</th>
         <th>Fuel Capacity</th>
+        <th>Action</th> 
       </tr>
     </thead>
     <tbody id="truckTableBody"></tbody>
   </table>
 
   <script>
-    function toggleFlatbedLength() {
-      const trailerSelect = document.getElementById('trailer');
-      const flatbedLengthContainer = document.getElementById('flatbedLengthContainer');
+    function toggleFlatbedLength(selectElement) {
+  const formType = selectElement.id === 'updateTrailer' ? 'update' : 'add';
+  const trailerSelect = document.getElementById(formType === 'update' ? 'updateTrailer' : 'Trailer');
+  const flatbedLengthContainer = document.getElementById(formType === 'update' ? 'updateFlatbedLengthContainer' : 'FlatbedLengthContainer');
 
-      if (trailerSelect.value === 'flatbed') {
-        flatbedLengthContainer.style.display = 'block';
-      } else {
-        flatbedLengthContainer.style.display = 'none';
-      }
-    }
+  if (trailerSelect.value === 'Flatbed') {
+    flatbedLengthContainer.style.display = 'flex';
+  } else {
+    flatbedLengthContainer.style.display = 'none';
+  }
+}
 
+
+//Fetch trucks data from the server
     async function fetchTrucksData() {
       try {
         const response = await fetch('/api/trucks');
+        if (!response.ok) {
+          throw new Error('Failed to fetch trucks data. Please try again later.');
+        }
         const data = await response.json();
         displayTrucks(data);
       } catch (error) {
-        console.error('Error fetching trucks data:', error);
+        console.error('Error fetching trucks data:', error.message);
       }
     }
 
+    //Display trucks data in the table
     function displayTrucks(trucks) {
       const tableBody = document.getElementById('truckTableBody');
       tableBody.innerHTML = '';
 
+      // Clear existing rows
+      tableBody.innerHTML = '';
+
       if (trucks.length === 0) {
+        // If no trucks, create a row with empty cells
         const emptyRow = document.createElement('tr');
         for (let i = 0; i < 10; i++) {
           const emptyCell = document.createElement('td');
@@ -132,7 +178,6 @@
         trucks.forEach(truck => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${truck.TruckID}</td>
             <td>${truck.Year}</td>
             <td>${truck.Make}</td>
             <td>${truck.Model}</td>
@@ -142,67 +187,218 @@
             <td>${truck.EquipmentNumber}</td>
             <td>${truck.FuelMileage}</td>
             <td>${truck.FuelCapacity}</td>
+            <td>
+              <button onclick="updateTruck('${truck.TruckID}')">Update</button>
+              <button onclick="deleteTruck('${truck.TruckID}')">Delete</button>
+            </td>
           `;
           tableBody.appendChild(row);
         });
       }
     }
 
+    //Fetch trucks data when the page loads
     window.addEventListener('load', () => {
       fetchTrucksData();
+      attachUpdateFormEventListener();
     });
 
-    // Check if addTruckForm is already defined before declaring it
-    if (!window.addTruckForm) {
+    // Add event listener for the form submission
+    document.addEventListener('DOMContentLoaded', function () {
       const addTruckForm = document.getElementById('addTruckForm');
       addTruckForm.addEventListener('submit', addTruck);
-      window.addTruckForm = addTruckForm;
-    }
+    });
 
+    // Function to handle form submission and validate input fields
     async function addTruck(event) {
       event.preventDefault();
 
-      const year = document.getElementById('year').value;
-      const make = document.getElementById('make').value;
-      const model = document.getElementById('model').value;
-      const tareWeight = document.getElementById('tareWeight').value;
-      const plate = document.getElementById('plate').value;
-      const trailer = document.getElementById('trailer').value;
-      const flatbedLength = document.getElementById('flatbedLength').value;
-      const equipmentNumber = document.getElementById('equipmentNumber').value;
-      const fuelMileage = document.getElementById('fuelMileage').value;
-      const fuelCapacity = document.getElementById('fuelCapacity').value;
+      try{
+        //Validate Year
+      const Year = document.getElementById('Year').value;
+      if (!Year){
+        throw new Error ('Year is required.')
+      }
 
-      try {
-        const response = await fetch('/addTruck', {
+      //Validate Make
+      const Make = document.getElementById('Make').value;
+      if (!Make) {
+        throw new Error ('Make is required.')
+      }
+
+      //Validate Model
+      const Model = document.getElementById('Model').value;
+      if (!Model) {
+        throw new Error ('Model is required.')
+      }
+
+      //Validate TareWeight
+      const TareWeight = document.getElementById('TareWeight').value.trim();
+      if(!TareWeight){
+        throw new Error ('Tare Weight is required and in the incorrect format. Please enter an 18-digin number')
+      }
+
+      //Validate Plate
+      const Plate = document.getElementById('Plate').value;
+      if (!Plate) {
+        throw new Error ('Plate is required.')
+      }
+
+      //Validate Trailer
+      const Trailer = document.getElementById('Trailer').value;
+      if (!Trailer) {
+        throw new Error ('Trailer is required.')
+      }
+
+      //Validate FlatbedLength
+      const FlatbedLength = document.getElementById('FlatbedLength').value;
+
+      //Validate Equipment Number
+      const EquipmentNumber = document.getElementById('EquipmentNumber').value;
+      if (!EquipmentNumber) {
+        throw new Error ('Equipment Number is required.')
+      }
+
+      //Validate Fuel Mileage
+      const FuelMileage = document.getElementById('FuelMileage').value;
+      if (!FuelMileage) {
+        throw new Error ('Fuel Mileage is required.')
+      }
+
+      //Validate Fuel Capacity
+      const FuelCapacity = document.getElementById('FuelCapacity').value;
+      if (!FuelCapacity) {
+        throw new Error ('Fuel Capacity is required.')
+      }
+
+      //Send data to the server for adding a new truck
+        const response = await fetch('/api/trucks', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            year,
-            make,
-            model,
-            tareWeight,
-            plate,
-            trailer,
-            flatbedLength,
-            equipmentNumber,
-            fuelMileage,
-            fuelCapacity,
+            Year: Year,
+            Make: Make,
+            Model: Model,
+            TareWeight: TareWeight,
+            Plate: Plate,
+            Trailer: Trailer,
+            ...(FlatbedLength && {FlatbedLength: FlatbedLength}),
+            EquipmentNumber: EquipmentNumber,
+            FuelMileage: FuelMileage,
+            FuelCapacity: FuelCapacity,
           }),
         });
 
         if (response.ok) {
           console.log('Truck added successfully');
+          // Reset the form after successful submission
+          event.target.reset(); // Reset the form
           fetchTrucksData();
         } else {
-          console.error('Failed to add truck');
+          throw new Error('Failed to add truck. Please try again later.');
         }
       } catch (error) {
-        console.error('Error adding truck:', error);
+        console.error('Error adding truck:', error.message);
       }
     }
+
+    //Function to update Truck
+    async function updateTruck(TruckID) {
+      console.log('Update button clicked');
+      // Show the update truck form
+      const updateForm = document.getElementById('updateTruckForm');
+
+      try {
+        const response = await fetch(`/api/trucks/${TruckID}`); // Fetch truck details by ID
+        if (!response.ok) {
+          throw new Error('Failed to fetch truck details. Please try again later.');
+        }
+        const truck = await response.json();
+
+        // Populate the update form with truck details
+        document.getElementById('updateYear').value = truck.Year;
+        document.getElementById('updateMake').value = truck.Make;
+        document.getElementById('updateModel').value = truck.Model;
+        document.getElementById('updateTareWeight').value = truck.TareWeight;
+        document.getElementById('updatePlate').value = truck.Plate;
+        document.getElementById('updateTrailer').value = truck.Trailer;
+        document.getElementById('updateFlatbedLength').value = truck.FlatbedLength || '';
+        document.getElementById('updateEquipmentNumber').value = truck.EquipmentNumber;
+        document.getElementById('updateFuelMileage').value = truck.FuelMileage;
+        document.getElementById('updateFuelCapacity').value = truck.FuelCapacity;
+
+        // Set the truck ID as a data attribute in the form
+        updateForm.dataset.TruckID = TruckID;
+
+        // Display the update form
+      updateForm.style.display = 'flex';
+
+      } catch (error) {
+        console.error('Error fetching Truck details:', error.message);
+      }
+    }
+
+    // Function to attach event listener for the update form
+    function attachUpdateFormEventListener() {
+      document.getElementById('updateTruckForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const id = this.dataset.TruckID; // Retrieve the Truck ID from the form's dataset
+        const data = {
+          Year: document.getElementById('updateYear').value,
+          Make: document.getElementById('updateMake').value,
+          Model: document.getElementById('updateModel').value,
+          TareWeight: document.getElementById('updateTareWeight').value,
+          Plate: document.getElementById('updatePlate').value,
+          Trailer: document.getElementById('updateTrailer').value,
+          FlatbedLength: document.getElementById('updateFlatbedLength').value,
+          EquipmentNumber: document.getElementById('updateEquipmentNumber').value ,
+          FuelMileage: document.getElementById('updateFuelMileage').value,
+          FuelCapacity:document.getElementById('updateFuelCapacity').value
+        };
+
+        try {
+          const response = await fetch(`/api/trucks/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            console.log('Truck updated successfully');
+            // Optionally, you can fetch and update the entire truck list here
+            fetchTrucksData();
+          } else {
+            throw new Error('Failed to update truck. Please try again later.');
+          }
+        } catch (error) {
+          console.error('Error updating truck:', error.message);
+        }
+      });
+    }
+
+    // Function to handle deleting a Truck
+    async function deleteTruck(TruckID) {
+      try {
+        const response = await fetch(`/deleteTruck/${TruckID}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          console.log('Truck deleted successfully');
+          fetchTrucksData(); // Refresh the table after deletion
+        } else {
+          throw new Error('Failed to delete truck. Please try again later.');
+        }
+      } catch (error) {
+        console.error('Error deleting truck:', error.message);
+      }
+    }
+
   </script>
 
 </body>

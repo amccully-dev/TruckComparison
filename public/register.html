@@ -26,9 +26,7 @@
         <br>
         <label for="resetQuestion">Password Reset Question:</label>
         <select id="resetQuestion" name="resetQuestion" required="">
-          <option value="" disabled="" selected="">Select a question</option>
-          <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-          <option value="What is the name of your first pet?">What is the name of your first pet?</option>
+          <option value="" selected="">Select a question</option>
         </select>
         <br>
         <label for="resetAnswer">Password Reset Answer:</label>
@@ -53,8 +51,37 @@
     </div>
   </div>
 
-  <script src="scripts.js"></script>
   <script> 
+     // Fetch password reset questions from server and populate the dropdown
+     async function populateResetQuestions() {
+      try {
+        const response = await fetch('/passwordResetQuestions');
+        if (!response.ok) {
+          throw new Error('Failed to fetch password reset questions');
+        }
+        const questions = await response.json();
+        const selectElement = document.getElementById('resetQuestion');
+        selectElement.innerHTML = ''; // Clear existing options
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select a question';
+        selectElement.appendChild(defaultOption);
+        // Add fetched questions
+        questions.forEach(question => {
+          const option = document.createElement('option');
+          option.value = question;
+          option.textContent = question;
+          selectElement.appendChild(option);
+        });
+      } catch (error) {
+        console.error('An error occurred while fetching password reset questions:', error);
+      }
+    }
+    
+    // Call the function to populate password reset questions on page load
+    populateResetQuestions();
+    
       // Function to toggle password visibility
       function togglePasswordVisibility() {
         const passwordInput = document.getElementById('password');
@@ -99,68 +126,78 @@
         return true;
       }
   
-      // Event listener for the registration form submission
-      document.getElementById('registerForm').addEventListener('submit', async function (event) {
-        event.preventDefault();
-  
-        // Gather user input from the registration form
-        const username = document.getElementById('username').value;
-        const firstName = document.getElementById('firstName').value;
-        const lastName = document.getElementById('lastName').value;
-        const password = document.getElementById('password').value;
-        const resetQuestion = document.getElementById('resetQuestion').value;
-        const resetAnswer = document.getElementById('resetAnswer').value;
-  
-        // Validate password
-        if (!validatePassword(password)) {
-          const errorMessage = document.getElementById('errorMessage');
-          errorMessage.textContent = 'Password does not meet requirements. Please ensure it has 2 upper case letters, 2 lower case letters, 2 special characters, 2 numbers, and is between 8-20 characters.';
-          errorMessage.style.color = 'red';
-          return;
-        }
-  
-        try {
-          // Send a registration request to the server
-          const response = await fetch('/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, firstName, lastName, password, resetQuestion, resetAnswer }),
-          });
-  
-          if (response.ok) {
+// Event listener for the registration form submission
+document.getElementById('registerForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    // Gather user input from the registration form
+    const username = document.getElementById('username').value;
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const password = document.getElementById('password').value;
+    const resetQuestion = document.getElementById('resetQuestion').value;
+    const resetAnswer = document.getElementById('resetAnswer').value;
+
+    // Remove previous error message
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = '';
+    errorMessage.style.color = '';
+
+    // Validate password
+    if (!validatePassword(password)) {
+        errorMessage.textContent = 'Password does not meet requirements. Please ensure it has 2 upper case letters, 2 lower case letters, 2 special characters, 2 numbers, and is between 8-20 characters.';
+        errorMessage.style.color = 'red';
+        return;
+    }
+
+    try {
+    const response = await fetch('/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, firstName, lastName, password, resetQuestion, resetAnswer }),
+    });
+
+    const responseData = await response.text(); // Get the response text
+    console.log('Response from server:', responseData); // Log the response text
+
+    if (response.ok) {
             // Registration successful
             console.log('Registration successful');
-  
+
             // Display a success message to the user
             const successMessage = document.createElement('p');
             successMessage.textContent = 'User successfully added! You can now log in.';
             successMessage.style.color = 'green';
-  
+
             // Append the message to the form
             const form = document.getElementById('registerForm');
             form.insertAdjacentElement('afterend', successMessage);
-          } else {
+        } else {
             // Registration failed, display an error message
             const errorData = await response.json();
             console.error('User registration failed:', errorData);
-  
-            // Display error message on the page
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = `User registration failed. ${errorData.message || 'Please try again later.'}`;
+
+            // Check if the error message indicates a duplicate username
+            if (errorData.handlerName === 'onErrorMessage' && errorData.message.includes('Violation of PRIMARY KEY constraint')) {
+                errorMessage.textContent = 'Username is already in use. Please choose a different username.';
+            } else {
+                // Display generic error message
+                errorMessage.textContent = `User registration failed. ${errorData.message || 'Please try again later.'}`;
+            }
             errorMessage.style.color = 'red';
-          }
-        } catch (error) {
-          // Handle unexpected errors
-          console.error('An unexpected error occurred:', error);
-  
-          // Display error message on the page
-          const errorMessage = document.getElementById('errorMessage');
-          errorMessage.textContent = 'An unexpected error occurred. Please try again later.';
-          errorMessage.style.color = 'red';
         }
-      });
+    } catch (error) {
+        // Handle unexpected errors
+        console.error('An unexpected error occurred:', error);
+
+        // Display error message on the page
+        errorMessage.textContent = 'An unexpected error occurred. Please try again later.';
+        errorMessage.style.color = 'red';
+    }
+});
+
     </script>
 </body>
 <footer>
